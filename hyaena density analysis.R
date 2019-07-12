@@ -1,0 +1,196 @@
+# Clean your environment
+rm(list=ls())
+
+# Specify and set your working directory
+setwd("/Users/katywilliams/Documents/Katy's documents/NRF postdoc/SECR/secr/R files Courtney")
+
+library(dplyr)
+library(tibble)
+library(tidyr)
+library(secr)
+library(rgdal)
+library(sp)
+library(maptools)
+library(rgeos)
+library(raster)
+library(adehabitatHR)
+library(gstat)
+library(PBSmapping)
+library(maptools)
+library(readr)
+
+### CONVERT LON/LAT TO XY
+#panthera_traps <- read_csv("panthera traps.csv")
+#xy<- project(coordinates(panthera_traps), "+proj=utm +zone=35 +south +datum=WGS84 +units=m +no_defs")
+#write.csv(xy, "xy traps.csv")
+
+
+
+### CAPTURE DATA
+cptr_hst <-read.capthist('All_BH_AC.csv', list('Atherstone_BH_TD.csv','Dinokeng_BH_TD.csv','Ithala_BH_TD.csv','Khamab_BH_TD.csv','KPGR_BH_TD.csv','Kwandwe_BH_TD.csv','Lapalala_BH_TD.csv','Loskop_BH_TD.csv','Madikwe_BH_TD.csv','Pilanesberg_BH_TD.csv','Songimvelo_BH_TD.csv','Venetia_BH_TD.csv','Welgevonden_BH_TD.csv','Wonderkop_BH_TD.csv','Zingela_BH_TD.csv'), detector="proximity", fmt="trapID", trapcovnames=c('LeopardRAI','SpHyRAI','HumanRAI','ReserveSize'), skip=1)
+summary(cptr_hst, terse=TRUE)
+plot(cptr_hst, border=1100, tracks=TRUE, varycol=TRUE)
+
+
+
+### CHECKING RESERVES/TRAPS OVERLAP
+prj <- "+proj=utm +zone=35 +south +datum=WGS84 +units=m +no_defs"
+prjCRS <- CRS(prj)
+#ath <- spTransform(readOGR("Atherstone.shp"), prjCRS)
+#plot(ath)
+#plot(traps(cptr_hst$Ath), add=TRUE)
+#din <- spTransform(readOGR("Dinokeng.shp"), prjCRS)
+#plot(din)
+#plot(traps(cptr_hst$Din), add=TRUE)
+#ith <- spTransform(readOGR("Ithala.shp"), prjCRS) 
+#plot(ith)
+#plot(traps(cptr_hst$Ith), add=TRUE)    
+#kha <- spTransform(readOGR("Khamab.shp"), prjCRS)
+#plot(kha)
+#plot(traps(cptr_hst$Kha), add=TRUE)
+#kpg <- spTransform(readOGR("KPGR.shp"), prjCRS)
+#plot(kpg)
+#plot(traps(cptr_hst$Kpg), add=TRUE)
+#kwa <- spTransform(readOGR("Kwandwe.shp"), prjCRS)
+#plot(kwa)
+#plot(traps(cptr_hst$Kwa), add=TRUE)
+#lap <- spTransform(readOGR("Lapalala.shp"), prjCRS)
+#plot(lap)
+#plot(traps(cptr_hst$Lap), add=TRUE)
+#los <- spTransform(readOGR("Loskop.shp"), prjCRS)
+#plot(los)
+#plot(traps(cptr_hst$Los), add=TRUE) 
+#mad <- spTransform(readOGR("Madikwe.shp"), prjCRS)
+#plot(mad)
+#plot(traps(cptr_hst$Mad), add=TRUE)
+#pil <- spTransform(readOGR("Pilanesberg.shp"), prjCRS)
+#plot(pil)
+#plot(traps(cptr_hst$Pil), add=TRUE)
+#son <- spTransform(readOGR("Songimvelo.shp"), prjCRS)
+#plot(son)
+#plot(traps(cptr_hst$Son), add=TRUE)
+#ven <- spTransform(readOGR("Venetia.shp"), prjCRS)
+#plot(ven)
+#plot(traps(cptr_hst$Ven), add=TRUE)
+#wel <- spTransform(readOGR("Welgevonden.shp"), prjCRS)
+#plot(wel)
+#plot(traps(cptr_hst$Wel), add=TRUE)
+#won <- spTransform(readOGR("Wonderkop.shp"), prjCRS)
+#plot(won)
+#plot(traps(cptr_hst$Won), add=TRUE)
+#zin <- spTransform(readOGR("Zingela.shp"), prjCRS)
+#plot(zin)
+#plot(traps(cptr_hst$Zin), add=TRUE)
+
+
+
+### GET BUFFER
+suggest.buffer(cptr_hst)  ## varied from 8160 to 30164 so used 31000 to encompass all
+
+
+
+### MASK
+traps<- read.traps ('traps.txt', detector='proximity')  
+mask<- make.mask(traps, buffer=31000, spacing=500, type='trapbuffer') # includes nonhabitat (but not for open sites?) due to buffer
+plot(mask)
+plot(traps(cptr_hst), add=TRUE)
+
+all<- spTransform(readOGR("all.shp"), prjCRS) # polygon of habitat (i.e. reserves)
+plot(all)
+plot(traps(cptr_hst), add=TRUE)
+
+mask2 <- make.mask(traps(cptr_hst), type='trapbuffer', spacing=500, buffer=31000, poly=all) # clipped to reserve boundaries
+plot(mask2)
+plot(traps(cptr_hst), add=TRUE)
+
+
+
+#### TEST DETECTION FUNCTIONS
+HN<- secr.fit(cptr_hst, mask=mask2, detectfn=0)
+HZ<- secr.fit(cptr_hst, mask=mask2, detectfn=1)
+EX<- secr.fit(cptr_hst, mask=mask2, detectfn=2)
+
+aic.df<- AIC(HN, HZ, EX)
+aic.df # HZ (1) has lowest AIC
+
+
+
+#### FIT SECR MODEL
+# | D = density                                 |
+# | g0 = magnitude of detection function        |
+# | sigma = spatial scale of detection function | 
+
+### g0
+# null
+model1<- secr.fit(cptr_hst, model=g0~1, mask=mask2, detectfn=1, CL=TRUE) 
+
+# is magnitude of detection a learned response
+model2<- secr.fit(cptr_hst, model=g0~b, mask=mask2, detectfn=1, CL=TRUE)
+
+# is magnitude of detection affected by site
+model3<- secr.fit(cptr_hst, model=g0~session, mask=mask2, detectfn=1, CL=TRUE)
+
+# is magnitude of detection affected by leopards
+model4<- secr.fit(cptr_hst, model=g0~LeopardRAI, mask=mask2, detectfn=1, CL=TRUE)
+
+# is magnitude of detection affected by spotteds
+model5<- secr.fit(cptr_hst, model=g0~SpHyRAI, mask=mask2, detectfn=1, CL=TRUE) 
+
+# is magnitude of detection affected by humans
+model6<- secr.fit(cptr_hst, model=g0~HumanRAI, mask=mask2, detectfn=1, CL=TRUE) 
+
+# is magnitude of detection affected by reserve size
+model7<- secr.fit(cptr_hst, model=g0~ReserveSize, mask=mask2, detectfn=1, CL=TRUE) 
+
+
+### MODEL SELECTION
+aic.models<-  AIC(model1, model2, model3, model4, model5, model6, model7)
+aic.models
+
+
+### D
+# null
+model8<- secr.fit(cptr_hst, model=D~1, mask=mask2, detectfn=1, CL=TRUE)
+
+# is density affected by site
+model9<- secr.fit(cptr_hst, model=D~session, mask=mask2, detectfn=1, CL=TRUE) 
+
+# is density affected by leopards
+model10 <- secr.fit(cptr_hst, model=D~LeopardRAI, mask=mask2, detectfn=1, CL=TRUE) 
+
+# is density affected by spotteds
+model11 <- secr.fit(cptr_hst, model=D~SpHyRAI, mask=mask2, detectfn=1, CL=TRUE) 
+
+# is density affected by humans
+model12 <- secr.fit(cptr_hst, model=D~HumanRAI, mask=mask2, detectfn=1, CL=TRUE) 
+
+# is density affected by reserve size
+model13 <- secr.fit(cptr_hst, model=D~ReserveSize, mask=mask2, detectfn=1, CL=TRUE) 
+
+
+### MODEL SELECTION
+aic.models<-  AIC(model8, model9, model10, model11, model12, model13)
+aic.models
+
+### Use derived to get density estimates
+derived(model3)
+
+### To save all rdata
+#save.image(file='SECR.rdata')
+
+
+### To test effective sample area ****really not sure this is right at all. BUT need to check if the esa outputs are similar to the reserve size. If similar then a truncated statespace is justified.
+initialsigma <- RPSV(cptr_hst, CC = TRUE)
+initialsigma #ranges between 2227.696 and 8099.016
+
+fit <- secr.fit(cptr_hst, buffer = 31000, trace = FALSE)
+esa.plot(fit)
+abline(v = 4 * 8047.571, lty = 2, col = 'red') #I put in the highest initialsigma value, not sure that this is right??***
+
+###
+
+# Sam
+
+
+
+

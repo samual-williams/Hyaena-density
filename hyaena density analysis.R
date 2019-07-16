@@ -25,7 +25,7 @@ panthera_traps <- read_csv("panthera traps.csv")
 # write.csv(xy, "xy traps.csv")
 
 ### CAPTURE DATA
-cptr_hst <-read.capthist('All_BH_AC.csv', list('Atherstone_BH_TD.csv','Dinokeng_BH_TD.csv','Ithala_BH_TD.csv','Khamab_BH_TD.csv','KPGR_BH_TD.csv','Kwandwe_BH_TD.csv','Lapalala_BH_TD.csv','Loskop_BH_TD.csv','Madikwe_BH_TD.csv','Pilanesberg_BH_TD.csv','Songimvelo_BH_TD.csv','Venetia_BH_TD.csv','Welgevonden_BH_TD.csv','Wonderkop_BH_TD.csv','Zingela_BH_TD.csv'), detector="proximity", fmt="trapID", trapcovnames=c('LeopardRAI','SpHyRAI','HumanRAI','ReserveSize'), skip=1)
+cptr_hst <-read.capthist('All_BH_AC.csv', list('Atherstone_BH_TD.csv','Dinokeng_BH_TD.csv','Ithala_BH_TD.csv','Khamab_BH_TD.csv','KPGR_BH_TD.csv','Kwandwe_BH_TD.csv','Lapalala_BH_TD.csv','Loskop_BH_TD.csv','Madikwe_BH_TD.csv','Pilanesberg_BH_TD.csv','Songimvelo_BH_TD.csv','Venetia_BH_TD.csv','Welgevonden_BH_TD.csv','Wonderkop_BH_TD.csv','Zingela_BH_TD.csv'), detector="proximity", fmt="trapID", trapcovnames=c('LeopardRAI','SpHyRAI','HumanRAI','ReserveSize', 'Impenetrable'), skip=1)
 summary(cptr_hst, terse=TRUE)
 plot(cptr_hst, border=1100, tracks=TRUE, varycol=TRUE)
 
@@ -110,72 +110,77 @@ plot(traps(cptr_hst), add=TRUE)
 
 #### TEST DETECTION FUNCTIONS
 
-HN<- secr.fit(cptr_hst, mask=maskClosed, detectfn=0)
-HZ<- secr.fit(cptr_hst, mask=maskClosed, detectfn=1)
-EX<- secr.fit(cptr_hst, mask=maskClosed, detectfn=2)
+HN <- secr.fit(cptr_hst, mask=maskClosed, detectfn=0)
+HZ <- secr.fit(cptr_hst, mask=maskClosed, detectfn=1)
+EX <- secr.fit(cptr_hst, mask=maskClosed, detectfn=2)
 
-aic.df<- AIC(HN, HZ, EX)
-aic.df # HZ (1) has lowest AIC
+aic.df.closed <- AIC(HN, HZ, EX)
+aic.df.closed # HZ (1) has lowest AIC
 
 #### FIT SECR MODEL
 # | D = density                                 |
 # | g0 = magnitude of detection function (capture probability when trap is at AC)       |
 # | sigma = spatial scale of detection function | 
 
-### g0
+### g0 closed
 # null
-model1 <- secr.fit(cptr_hst, model=g0~1, mask=maskClosed, detectfn=1, CL=TRUE) 
+mClosedg01 <- secr.fit(cptr_hst, model=g0~1, mask=maskClosed, detectfn=1, CL=TRUE) 
 
 # is magnitude of detection a learned response
-model2 <- secr.fit(cptr_hst, model=g0~b, mask=maskClosed, detectfn=1, CL=TRUE)
+mClosedg02 <- secr.fit(cptr_hst, model=g0~b, mask=maskClosed, detectfn=1, CL=TRUE)
 
 # is magnitude of detection affected by site
-model3 <- secr.fit(cptr_hst, model=g0~session, mask=maskClosed, detectfn=1, CL=TRUE)
+mClosedg03 <- secr.fit(cptr_hst, model=g0~session, mask=maskClosed, detectfn=1, CL=TRUE)
 
 # is magnitude of detection affected by leopards
-model4 <- secr.fit(cptr_hst, model=g0~LeopardRAI, mask=maskClosed, detectfn=1, CL=TRUE)
+mClosedg04 <- secr.fit(cptr_hst, model=g0~LeopardRAI, mask=maskClosed, detectfn=1, CL=TRUE)
 
 # is magnitude of detection affected by spotteds
-model5 <- secr.fit(cptr_hst, model=g0~SpHyRAI, mask=maskClosed, detectfn=1, CL=TRUE) 
+mClosedg05 <- secr.fit(cptr_hst, model=g0~SpHyRAI, mask=maskClosed, detectfn=1, CL=TRUE) 
 
 # is magnitude of detection affected by humans
-model6 <- secr.fit(cptr_hst, model=g0~HumanRAI, mask=maskClosed, detectfn=1, CL=TRUE) 
+mClosedg06 <- secr.fit(cptr_hst, model=g0~HumanRAI, mask=maskClosed, detectfn=1, CL=TRUE) 
 
 # is magnitude of detection affected by reserve size
-model7 <- secr.fit(cptr_hst, model=g0~ReserveSize, mask=maskClosed, detectfn=1, CL=TRUE) 
+mClosedg07 <- secr.fit(cptr_hst, model=g0~ReserveSize, mask=maskClosed, detectfn=1, CL=TRUE) 
 
+# is magnitude of detection affected by fence permeability
+mClosedg08 <- secr.fit(cptr_hst, model=g0~Impenetrable, mask=maskClosed, detectfn=1, CL=TRUE) 
 
 ### MODEL SELECTION
-aic.models <- AIC(model1, model2, model3, model4, model5, model6, model7)
-aic.models
+aic.mClosedg0 <- AIC(mClosedg01, mClosedg02, mClosedg03, mClosedg04, mClosedg05, mClosedg06, mClosedg07, mClosedg08)
+aic.mClosedg0
 
 
-### D
+### D closed
 # null
-model8 <- secr.fit(cptr_hst, model=D~1, mask=maskClosed, detectfn=1, CL=TRUE)
+mClosedD1 <- secr.fit(cptr_hst, model=D~1, mask=maskClosed, detectfn=1, CL=TRUE)
 
 # is density affected by site
-model9 <- secr.fit(cptr_hst, model=D~session, mask=maskClosed, detectfn=1, CL=TRUE) 
+mClosedD2 <- secr.fit(cptr_hst, model=D~session, mask=maskClosed, detectfn=1, CL=TRUE) 
 
 # is density affected by leopards
-model10 <- secr.fit(cptr_hst, model=D~LeopardRAI, mask=maskClosed, detectfn=1, CL=TRUE) 
+mClosedD3 <- secr.fit(cptr_hst, model=D~LeopardRAI, mask=maskClosed, detectfn=1, CL=TRUE) 
 
 # is density affected by spotteds
-model11 <- secr.fit(cptr_hst, model=D~SpHyRAI, mask=maskClosed, detectfn=1, CL=TRUE) 
+mClosedD4 <- secr.fit(cptr_hst, model=D~SpHyRAI, mask=maskClosed, detectfn=1, CL=TRUE) 
 
 # is density affected by humans
-model12 <- secr.fit(cptr_hst, model=D~HumanRAI, mask=maskClosed, detectfn=1, CL=TRUE) 
+mClosedD5 <- secr.fit(cptr_hst, model=D~HumanRAI, mask=maskClosed, detectfn=1, CL=TRUE) 
 
 # is density affected by reserve size
-model13 <- secr.fit(cptr_hst, model=D~ReserveSize, mask=maskClosed, detectfn=1, CL=TRUE) 
+mClosedD6 <- secr.fit(cptr_hst, model=D~ReserveSize, mask=maskClosed, detectfn=1, CL=TRUE) 
+
+# is density affected by fence permeability
+mClosedD7 <- secr.fit(cptr_hst, model=D~Impenetrable, mask=maskClosed, detectfn=1, CL=TRUE) 
 
 
 ### MODEL SELECTION
-aic.models <-  AIC(model8, model9, model10, model11, model12, model13)
-aic.models
+aic.mClosedD <-  AIC(modeld1, modeld2, modeld3, modeld4, modeld5, modeld6, modeld7)
+aic.mClosedD
 
 ### Use derived to get density estimates
-derived(model3)
+derived(mClosedD1)
 
 
 ######
@@ -188,70 +193,74 @@ derived(model3)
 
 #### TEST DETECTION FUNCTIONS
 
-HN<- secr.fit(cptr_hst, mask=maskOpen, detectfn=0)
-HZ<- secr.fit(cptr_hst, mask=maskOpen, detectfn=1)
-EX<- secr.fit(cptr_hst, mask=maskOpen, detectfn=2)
+HN <- secr.fit(cptr_hst, mask=maskOpen, detectfn=0)
+HZ <- secr.fit(cptr_hst, mask=maskOpen, detectfn=1)
+EX <- secr.fit(cptr_hst, mask=maskOpen, detectfn=2)
 
-aic.df<- AIC(HN, HZ, EX)
-aic.df # has lowest AIC
-
+aic.df.open <- AIC(HN, HZ, EX)
+aic.df.open # has lowest AIC
 
 #### FIT SECR MODEL
 
-### g0
+### g0 open
 # null
-model1 <- secr.fit(cptr_hst, model=g0~1, mask=maskOpen, detectfn=1, CL=TRUE) 
+mOpeng01 <- secr.fit(cptr_hst, model=g0~1, mask=maskOpen, detectfn=1, CL=TRUE) 
 
 # is magnitude of detection a learned response
-model2 <- secr.fit(cptr_hst, model=g0~b, mask=maskOpen, detectfn=1, CL=TRUE)
+mOpeng02 <- secr.fit(cptr_hst, model=g0~b, mask=maskOpen, detectfn=1, CL=TRUE)
 
 # is magnitude of detection affected by site
-model3 <- secr.fit(cptr_hst, model=g0~session, mask=maskOpen, detectfn=1, CL=TRUE)
+mOpeng03 <- secr.fit(cptr_hst, model=g0~session, mask=maskOpen, detectfn=1, CL=TRUE)
 
 # is magnitude of detection affected by leopards
-model4 <- secr.fit(cptr_hst, model=g0~LeopardRAI, mask=maskOpen, detectfn=1, CL=TRUE)
+mOpeng04 <- secr.fit(cptr_hst, model=g0~LeopardRAI, mask=maskOpen, detectfn=1, CL=TRUE)
 
 # is magnitude of detection affected by spotteds
-model5 <- secr.fit(cptr_hst, model=g0~SpHyRAI, mask=maskOpen, detectfn=1, CL=TRUE) 
+mOpen05 <- secr.fit(cptr_hst, model=g0~SpHyRAI, mask=maskOpen, detectfn=1, CL=TRUE) 
 
 # is magnitude of detection affected by humans
-model6 <- secr.fit(cptr_hst, model=g0~HumanRAI, mask=maskOpen, detectfn=1, CL=TRUE) 
+mOpen06 <- secr.fit(cptr_hst, model=g0~HumanRAI, mask=maskOpen, detectfn=1, CL=TRUE) 
 
 # is magnitude of detection affected by reserve size
-model7 <- secr.fit(cptr_hst, model=g0~ReserveSize, mask=maskOpen, detectfn=1, CL=TRUE) 
+mOpeng07 <- secr.fit(cptr_hst, model=g0~ReserveSize, mask=maskOpen, detectfn=1, CL=TRUE) 
 
+# is magnitude of detection affected by fence permeability
+mOpeng08 <- secr.fit(cptr_hst, model=g0~Impenetrable, mask=maskOpen, detectfn=1, CL=TRUE) 
 
 ### MODEL SELECTION
-aic.models <- AIC(model1, model2, model3, model4, model5, model6, model7)
-aic.models
+aic.mOpeng0 <- AIC(mOpeng01, mOpeng02, mOpeng03, mOpeng04, mOpeng05, mOpeng06, mOpeng07, mOpeng08)
+aic.mOpeng0
 
 
-### D
+### D open
 # null
-model8 <- secr.fit(cptr_hst, model=D~1, mask=maskOpen, detectfn=1, CL=TRUE)
+mOpenD1 <- secr.fit(cptr_hst, model=D~1, mask=maskOpen, detectfn=1, CL=TRUE)
 
 # is density affected by site
-model9 <- secr.fit(cptr_hst, model=D~session, mask=maskOpen, detectfn=1, CL=TRUE) 
+mOpenD2 <- secr.fit(cptr_hst, model=D~session, mask=maskOpen, detectfn=1, CL=TRUE) 
 
 # is density affected by leopards
-model10 <- secr.fit(cptr_hst, model=D~LeopardRAI, mask=maskOpen, detectfn=1, CL=TRUE) 
+mOpenD3 <- secr.fit(cptr_hst, model=D~LeopardRAI, mask=maskOpen, detectfn=1, CL=TRUE) 
 
 # is density affected by spotteds
-model11 <- secr.fit(cptr_hst, model=D~SpHyRAI, mask=maskOpen, detectfn=1, CL=TRUE) 
+mOpenD4 <- secr.fit(cptr_hst, model=D~SpHyRAI, mask=maskOpen, detectfn=1, CL=TRUE) 
 
 # is density affected by humans
-model12 <- secr.fit(cptr_hst, model=D~HumanRAI, mask=maskOpen, detectfn=1, CL=TRUE) 
+mOpenD5 <- secr.fit(cptr_hst, model=D~HumanRAI, mask=maskOpen, detectfn=1, CL=TRUE) 
 
 # is density affected by reserve size
-model13 <- secr.fit(cptr_hst, model=D~ReserveSize, mask=maskOpen, detectfn=1, CL=TRUE) 
+mOpenD6 <- secr.fit(cptr_hst, model=D~ReserveSize, mask=maskOpen, detectfn=1, CL=TRUE) 
+
+# is density affected by fence permeability
+mOpenD7 <- secr.fit(cptr_hst, model=D~Impenetrable, mask=maskOpen, detectfn=1, CL=TRUE) 
 
 
-### MODEL SELECTION
-aic.models <-  AIC(model8, model9, model10, model11, model12, model13)
-aic.models
+### MODEL SELECTION open
+aic.mOpenD <-  AIC(modeld1, modeld2, modeld3, modeld4, modeld5, modeld6, modeld7)
+aic.mOpenD
 
 ### Use derived to get density estimates
-derived(model3)
+derived(mOpenD1)
 
 
 

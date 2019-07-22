@@ -26,8 +26,8 @@ panthera_traps <- read_csv("panthera traps.csv")
 
 ### CAPTURE DATA
 cptr_hst <-read.capthist('All_BH_AC.csv', list('Atherstone_BH_TD.csv','Dinokeng_BH_TD.csv','Ithala_BH_TD.csv','Khamab_BH_TD.csv','KPGR_BH_TD.csv','Kwandwe_BH_TD.csv','Lapalala_BH_TD.csv','Loskop_BH_TD.csv','Madikwe_BH_TD.csv','Pilanesberg_BH_TD.csv','Songimvelo_BH_TD.csv','Venetia_BH_TD.csv','Welgevonden_BH_TD.csv','Wonderkop_BH_TD.csv','Zingela_BH_TD.csv'), detector="proximity", fmt="trapID", trapcovnames=c('LeopardRAI','SpHyRAI','HumanRAI','ReserveSize', 'Impenetrable'), skip=1)
-summary(cptr_hst, terse=TRUE)
-plot(cptr_hst, border=1100, tracks=TRUE, varycol=TRUE)
+# summary(cptr_hst, terse=TRUE)
+# plot(cptr_hst, border=1100, tracks=TRUE, varycol=TRUE)
 
 ### CHECKING RESERVES/TRAPS OVERLAP
 prj <- "+proj=utm +zone=35 +south +datum=WGS84 +units=m +no_defs"
@@ -110,11 +110,11 @@ plot(traps(cptr_hst), add=TRUE)
 
 #### TEST DETECTION FUNCTIONS
 
-HN <- secr.fit(cptr_hst, mask=maskClosed, detectfn=0)
-HZ <- secr.fit(cptr_hst, mask=maskClosed, detectfn=1)
-EX <- secr.fit(cptr_hst, mask=maskClosed, detectfn=2)
+HN.closed <- secr.fit(cptr_hst, mask=maskClosed, detectfn=0)
+HZ.closed <- secr.fit(cptr_hst, mask=maskClosed, detectfn=1)
+EX.closed <- secr.fit(cptr_hst, mask=maskClosed, detectfn=2)
 
-aic.df.closed <- AIC(HN, HZ, EX)
+aic.df.closed <- AIC(HN.closed, HZ.closed, EX.closed)
 aic.df.closed # HZ (1) has lowest AIC
 
 #### FIT SECR MODEL
@@ -145,10 +145,10 @@ mClosedg06 <- secr.fit(cptr_hst, model=g0~HumanRAI, mask=maskClosed, detectfn=1,
 mClosedg07 <- secr.fit(cptr_hst, model=g0~ReserveSize, mask=maskClosed, detectfn=1, CL=TRUE) 
 
 # is magnitude of detection affected by fence permeability
-mClosedg08 <- secr.fit(cptr_hst, model=g0~Impenetrable, mask=maskClosed, detectfn=1, CL=TRUE) 
+mClosedg08 <- secr.fit(cptr_hst, model=g0~Impenetrable, mask=maskClosed, detectfn=1, CL=TRUE) # Error in findvars.MS(trapcov, vars, c(4, 1)) : covariate factor levels differ between sessions 
 
 ### MODEL SELECTION
-aic.mClosedg0 <- AIC(mClosedg01, mClosedg02, mClosedg03, mClosedg04, mClosedg05, mClosedg06, mClosedg07, mClosedg08)
+aic.mClosedg0 <- AIC(mClosedg01, mClosedg02, mClosedg03, mClosedg04, mClosedg05, mClosedg06, mClosedg07)
 aic.mClosedg0
 
 
@@ -172,11 +172,11 @@ mClosedD5 <- secr.fit(cptr_hst, model=D~HumanRAI, mask=maskClosed, detectfn=1, C
 mClosedD6 <- secr.fit(cptr_hst, model=D~ReserveSize, mask=maskClosed, detectfn=1, CL=TRUE) 
 
 # is density affected by fence permeability
-mClosedD7 <- secr.fit(cptr_hst, model=D~Impenetrable, mask=maskClosed, detectfn=1, CL=TRUE) 
+# mClosedD7 <- secr.fit(cptr_hst, model=D~Impenetrable, mask=maskClosed, detectfn=1, CL=TRUE) # Would have same error as g0 model with this covariate - omit
 
 
 ### MODEL SELECTION
-aic.mClosedD <-  AIC(modeld1, modeld2, modeld3, modeld4, modeld5, modeld6, modeld7)
+aic.mClosedD <-  AIC(mClosedD1, mClosedD2, mClosedD3, mClosedD4, mClosedD5, mClosedD6)
 aic.mClosedD
 
 ### Use derived to get density estimates
@@ -193,11 +193,11 @@ derived(mClosedD1)
 
 #### TEST DETECTION FUNCTIONS
 
-HN <- secr.fit(cptr_hst, mask=maskOpen, detectfn=0)
-HZ <- secr.fit(cptr_hst, mask=maskOpen, detectfn=1)
-EX <- secr.fit(cptr_hst, mask=maskOpen, detectfn=2)
+HN.xopen <- secr.fit(cptr_hst, mask=maskOpen, detectfn=0)
+HZ.open <- secr.fit(cptr_hst, mask=maskOpen, detectfn=1)
+EX.open <- secr.fit(cptr_hst, mask=maskOpen, detectfn=2)
 
-aic.df.open <- AIC(HN, HZ, EX)
+aic.df.open <- AIC(HN.open, HZ.open, EX.open)
 aic.df.open # has lowest AIC
 
 #### FIT SECR MODEL
@@ -284,7 +284,5 @@ abline(v = 4 * 8047.571, lty = 2, col = 'red') #I put in the highest initialsigm
 ###
 
 # Sam
-
-
-
-
+# To do
+# - Check how models look using HN (0)

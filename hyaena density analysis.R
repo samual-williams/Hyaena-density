@@ -1,8 +1,5 @@
 # Clean your environment
-# rm(list=ls())
-
-# Specify and set your working directory
-# setwd("/Users/katywilliams/Documents/Katy's documents/NRF postdoc/SECR/secr/R files Courtney")
+rm(list=ls())
 
 library(dplyr)
 library(tibble)
@@ -251,13 +248,17 @@ mOpenD5 <- secr.fit(cptr_hst, model=D~HumanRAI, mask=maskOpen, detectfn=1, CL=TR
 # is density affected by reserve size
 mOpenD6 <- secr.fit(cptr_hst, model=D~ReserveSize, mask=maskOpen, detectfn=1, CL=TRUE) 
 
-# is density affected by fence permeability
-mOpenD7 <- secr.fit(cptr_hst, model=D~Impenetrable, mask=maskOpen, detectfn=1, CL=TRUE) 
+# is density affected by prey RAI
+mOpenD7 <- secr.fit(cptr_hst, model=D~PreyRAI, mask=maskClosed, detectfn=1, CL=TRUE) 
+
+# # is density affected by fence permeability
+# mOpenD7 <- secr.fit(cptr_hst, model=D~Impenetrable, mask=maskOpen, detectfn=1, CL=TRUE) 
 
 
 ### MODEL SELECTION open
-aic.mOpenD <-  AIC(modeld1, modeld2, modeld3, modeld4, modeld5, modeld6, modeld7)
+aic.mOpenD <-  AIC(mOpenD1, mOpenD2, mOpenD3, mOpenD4, mOpenD5, mOpenD6, mOpenD7)
 aic.mOpenD
+
 
 ### Use derived to get density estimates
 derived(mOpenD1)

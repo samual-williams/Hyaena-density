@@ -114,7 +114,7 @@ mOpen06 <- secr.fit(cptr_hst, model=g0~HumanRAI, mask=maskOpen, detectfn=1, CL=T
 mOpeng07 <- secr.fit(cptr_hst, model=g0~ReserveSize, mask=maskOpen, detectfn=1, CL=TRUE) 
 
 # is magnitude of detection affected by prey RAI
-mClosedg08 <- secr.fit(cptr_hst, model=g0~PreyRAI, mask=maskClosed, detectfn=1, CL=TRUE) 
+mOpeng08 <- secr.fit(cptr_hst, model=g0~PreyRAI, mask=maskClosed, detectfn=1, CL=TRUE) 
 
 # # is magnitude of detection affected by fence permeability
 # mOpeng08 <- secr.fit(cptr_hst, model=g0~Impenetrable, mask=maskOpen, detectfn=1, CL=TRUE) 

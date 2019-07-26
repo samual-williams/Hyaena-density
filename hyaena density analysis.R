@@ -1,4 +1,3 @@
-# Clean your environment
 rm(list=ls())
 
 library(dplyr)
@@ -179,11 +178,6 @@ aic.mClosedD
 ### Use derived to get density estimates
 derived(mClosedD1)
 
-
-######
-# End of Courtney's code
-######
-
 ###
 # Now fit models to maskOpen (buffers NOT clipped to boundaries, but infrastructure excluded)
 ###
@@ -252,7 +246,7 @@ mOpenD6 <- secr.fit(cptr_hst, model=D~ReserveSize, mask=maskOpen, detectfn=1, CL
 mOpenD7 <- secr.fit(cptr_hst, model=D~PreyRAI, mask=maskClosed, detectfn=1, CL=TRUE) 
 
 # # is density affected by fence permeability
-# mOpenD7 <- secr.fit(cptr_hst, model=D~Impenetrable, mask=maskOpen, detectfn=1, CL=TRUE) 
+# mOpenD8 <- secr.fit(cptr_hst, model=D~Impenetrable, mask=maskOpen, detectfn=1, CL=TRUE) 
 
 
 ### MODEL SELECTION open
@@ -262,28 +256,3 @@ aic.mOpenD
 
 ### Use derived to get density estimates
 derived(mOpenD1)
-
-
-
-
-
-
-# Experimental
-
-### To save all rdata
-#save.image(file='SECR.rdata')
-
-
-### To test effective sample area ****really not sure this is right at all. BUT need to check if the esa outputs are similar to the reserve size. If similar then a truncated statespace is justified.
-initialsigma <- RPSV(cptr_hst, CC = TRUE)
-initialsigma #ranges between 2227.696 and 8099.016
-
-fit <- secr.fit(cptr_hst, buffer = 31000, trace = FALSE)
-esa.plot(fit)
-abline(v = 4 * 8047.571, lty = 2, col = 'red') #I put in the highest initialsigma value, not sure that this is right??***
-
-###
-
-# Sam
-# To do
-# - Check how models look using HN (0)

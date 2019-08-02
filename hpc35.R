@@ -2,6 +2,6 @@ library(secr)
 
 load("inputs.RData")
 
-# is density affected by leopards
-mOpenD3 <- secr.fit(cptr_hst, model=D~LeopardRAI, mask=maskOpen, detectfn=1, CL=TRUE) 
-saveRDS(mOpenD3, file = "mOpenD3.rds")
+# is density affected by site
+mOpenD2 <- secr.fit(cptr_hst, model=list(D~session, g0~session), mask=maskOpen, detectfn=1, CL=TRUE) 
+saveRDS(mOpenD2, file = "mOpenD2.rds")

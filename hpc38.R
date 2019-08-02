@@ -1,11 +1,7 @@
-readRDS(file = "mOpenD1.rds")
-readRDS(file = "mOpenD2.rds")
-readRDS(file = "mOpenD3.rds")
-readRDS(file = "mOpenD4.rds")
-readRDS(file = "mOpenD5.rds")
-readRDS(file = "mOpenD6.rds")
-readRDS(file = "mOpenD7.rds")
+library(secr)
 
-### MODEL SELECTION
-aic.mOpenD <-  AIC(mOpenD1, mOpenD2, mOpenD3, mOpenD4, mOpenD5, mOpenD6, mOpenD7)
-saveRDS(aic.mOpenD, file = "aic.mOpenD.rds")
+load("inputs.RData")
+
+# is density affected by humans
+mOpenD5 <- secr.fit(cptr_hst, model=list(D~HumanRAI, g0~session), mask=maskOpen, detectfn=1, CL=TRUE)
+saveRDS(mOpenD5, file = "mOpenD5.rds")

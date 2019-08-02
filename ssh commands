@@ -1,0 +1,36 @@
+ssh dan3stw@hamilton.dur.ac.uk
+
+module load r/gcc/3.6.0
+cd /ddn/data/dan3stw
+R --save < scratch.R
+
+
+To Run batch job eg hpc.05.R to hpc.07.R:
+for  n  in  `seq  -f  %02g 5 7`
+do
+echo $n
+sbatch   -p  seq7.q    -n  1  --mem-per-cpu=4G job_hpc_v1.slurm   hpc${n}.R 
+done
+
+If need to format slurm
+dos2unix job_hpc_v1.slurm
+
+To check job status 
+sacct   -u  dan3stw
+squeue  -u  dan3stw
+
+To cancel a job 
+scancel jobid
+
+To cancel all jobs 
+scancel  -u  your_user_id
+
+To cancel all pending jobs 
+scancel  -t  PD
+
+
+
+
+
+
+

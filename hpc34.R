@@ -2,6 +2,6 @@ library(secr)
 
 load("inputs.RData")
 
-# is density affected by site
-mOpenD2 <- secr.fit(cptr_hst, model=D~session, mask=maskOpen, detectfn=1, CL=TRUE) 
-saveRDS(mOpenD2, file = "mOpenD2.rds")
+# null
+mOpenD1 <- secr.fit(cptr_hst, model=list(D~1, g0~session), mask=maskOpen, detectfn=1, CL=TRUE)
+saveRDS(mOpenD1, file = "mOpenD1.rds")

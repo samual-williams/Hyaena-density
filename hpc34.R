@@ -3,5 +3,5 @@ library(secr)
 load("inputs.RData")
 
 # null
-mOpenD1 <- secr.fit(cptr_hst, model=list(D~1, g0~session), mask=maskOpen, detectfn=1, CL=TRUE)
+mOpenD1 <- secr.fit(cptr_hst, model=list(D~1, g0~session), mask=maskOpen, detectfn=2, CL=TRUE)
 saveRDS(mOpenD1, file = "mOpenD1.rds")

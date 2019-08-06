@@ -45,12 +45,12 @@
 ## Request email to the user when certain type of events occur to
 ## the job
 
-#SBATCH  --mail-type=END
+#SBATCH  --mail-type=BEGIN,END
 
 ## where <type> can be one of BEGIN, END, FAIL, REQUEUE or ALL,
 ## and send to email address
 
-#SBATCH  --mail-user  samual.t.williams@gmail.com
+#SBATCH  --mail-user  s.t.williams@durham.ac.uk
 
 ## The default email name is that of the submitting user as known to the system.
 

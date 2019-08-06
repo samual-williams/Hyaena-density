@@ -251,7 +251,7 @@ mOpenD5 <- secr.fit(cptr_hst, model=list(D~HumanRAI, g0~session), mask=maskOpen,
 # is density affected by reserve size
 mOpenD6 <- secr.fit(cptr_hst, model=list(D~ReserveSize, g0~session), mask=maskOpen, detectfn=1, CL=TRUE) 
 
-# is density affected by prey RAI
+ # is density affected by prey RAI
 mOpenD7 <- secr.fit(cptr_hst, model=list(D~PreyRAI, g0~session), mask=maskClosed, detectfn=1, CL=TRUE) 
 
 # # is density affected by fence permeability

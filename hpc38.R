@@ -3,5 +3,5 @@ library(secr)
 load("inputs.RData")
 
 # is density affected by humans
-mOpenD5 <- secr.fit(cptr_hst, model=list(D~HumanRAI, g0~session), mask=maskOpen, detectfn=2, CL=TRUE)
+mOpenD5 <- secr.fit(cptr_hst, model=list(D~HumanRAI, g0~session), mask=maskOpen, detectfn=1, CL=FALSE)
 saveRDS(mOpenD5, file = "mOpenD5.rds")

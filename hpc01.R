@@ -1,4 +1,4 @@
-# rm(list=ls()) # clear environment
+rm(list=ls()) # clear environment
 
 library(dplyr)
 library(tibble)
@@ -32,12 +32,23 @@ traps <- read.traps('traps.txt', detector='proximity') # load traps
 # Create mask not clippped to reserve boundaries but excluding infrastructure
 infrastructure <- readOGR("sa_infrastructure_UTM.shp") # load infrastructure
 
-maskOpen <- make.mask(traps, buffer=31000, spacing=500, type='trapbuffer', poly = infrastructure, poly.habitat = FALSE) # maskOpen is NOT clippped to reserve boundaries, but excludes infrastructure
+maskOpen <- make.mask(traps(cptr_hst), buffer=31000, spacing=500, type='trapbuffer', poly = infrastructure, poly.habitat = FALSE) # maskOpen is NOT clippped to reserve boundaries, but excludes infrastructure
+head(covariates(maskOpen)) # not there
+
+### ADD COVARIATES TO MASK
+maskOpen <- addCovariates(maskOpen, traps(cptr_hst))
+head(covariates(maskOpen)) # there
 
 # Now create mask clipped to reserve boundaries
 # Create polygon of habitat (all reserves)
 all <- spTransform(readOGR("all.shp"), prjCRS) # load polygon of habitat (i.e. all reserves)
 
-maskClosed <- make.mask(traps(cptr_hst), type='trapbuffer', spacing=500, buffer=31000, poly=all) # MaskClosed IS clipped to reserve boundaries (infrastructure noit relavent)
+maskClosed <- make.mask(traps(cptr_hst), type='trapbuffer', spacing=500, buffer=31000, poly=all) # MaskClosed IS clipped to reserve boundaries (infrastructure not relavent)
+
+head(covariates(maskClosed)) # not there!
+
+### ADD COVARIATES TO MASK
+maskClosed <- addCovariates(maskClosed, traps(cptr_hst))
+head(covariates(maskClosed)) # there
 
 save.image(file = "inputs.RData")
